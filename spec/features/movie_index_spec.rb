@@ -10,12 +10,25 @@ RSpec.describe 'Movies Index Page' do
     end 
   end 
 
-  it 'shows all movies' do 
-    visit "users/#{@user1.id}"
+  it 'shows all movies' do
+    user = User.create(name: "funbucket13", email: "funbucket13@gmail.com", password: "test", password_confirmation: "test")
 
+    visit root_path
+
+    click_on "Log In"
+
+    expect(current_path).to eq(login_path)
+
+    fill_in :email, with: user.email
+    fill_in :password, with: user.password
+
+    click_on "Log In"
+
+    visit "/users/#{user.id}"
+    
     click_button "Find Top Rated Movies"
 
-    expect(current_path).to eq("/users/#{@user1.id}/movies")
+    expect(current_path).to eq("/users/#{user.id}/movies")
 
     expect(page).to have_content("Top Rated Movies")
 

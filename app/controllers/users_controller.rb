@@ -1,4 +1,6 @@
 class UsersController <ApplicationController 
+  before_action :require_login, only: [:show]
+  
   def new 
     @user = User.new()
   end 
@@ -12,6 +14,7 @@ class UsersController <ApplicationController
 
     if user.password == user.password_confirmation
       if user.save
+        session[:user_id] = user.id
         redirect_to user_path(user)
       else
         flash[:error] = user.errors.full_messages.to_sentence
@@ -29,14 +32,20 @@ class UsersController <ApplicationController
 
   def login_user
     user = User.find_by(email: params[:email])
-    if user.authenticate(params[:password])
+    if user && user.authenticate(params[:password])
       session[:user_id] = user.id
       flash[:success] = "Welcome, #{user.name}!"
-      redirect_to root_path
+      redirect_to user_path(user)
     else
       flash[:error] = "Sorry, your credentials are bad."
       render :login_form
     end
+  end
+
+  def logout
+    session[:user_id] = nil
+    flash[:success] = "You have been logged out successfully."
+    redirect_to root_path
   end
 
   private 
@@ -44,4 +53,11 @@ class UsersController <ApplicationController
   def user_params 
     params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end 
+
+  def require_login 
+    unless current_user
+      flash[:error] = "You must be logged in."
+      redirect_to root_path
+    end
+  end
 end 
