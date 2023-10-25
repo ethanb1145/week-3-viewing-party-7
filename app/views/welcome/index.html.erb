@@ -1,8 +1,12 @@
 <%= button_to "Create New User", register_path, method: :get %>
-<section class='existing-users'>
+<% if current_user %>
+    <%= link_to 'Log Out', logout_path, method: :delete %>
+    <section class='existing-users'>
     <p>Existing Users: </p>
     <% @users.each do |user| %>
-        <li><%= link_to user.email, user_path(user.id) %></li>
+        <li><%=user.email%></li>
     <% end %>
-</section>
-<%= link_to "Log In", login_path %>
+    </section>
+<% else %>
+  <%= link_to 'Log In'  , login_path %>
+<% end %>
